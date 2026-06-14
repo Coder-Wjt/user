@@ -100,6 +100,25 @@
                 <div v-if="qrUsingPayLinkFallback" class="mt-3 text-xs theme-text-muted">
                   {{ t('payment.qrFallbackHint') }}
                 </div>
+                <div v-if="hasCryptoPaymentDetails" class="mt-4 w-full max-w-xl space-y-2 rounded-xl border theme-border bg-white/5 p-3 text-left">
+                  <div
+                    v-for="item in cryptoPaymentDetails"
+                    :key="item.key"
+                    class="flex flex-col gap-1 border-b theme-border pb-2 last:border-b-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
+                  >
+                    <span class="shrink-0 text-xs theme-text-muted">{{ item.label }}</span>
+                    <span class="min-w-0 text-sm font-semibold theme-text-primary break-all sm:text-right">
+                      {{ item.value }}
+                      <span v-if="item.detail" class="ml-1 font-normal theme-text-muted">({{ item.detail }})</span>
+                    </span>
+                  </div>
+                  <div v-if="cryptoWalletAddress" class="flex flex-wrap items-center justify-end gap-2 pt-1">
+                    <button @click="handleCopyWalletAddress" class="px-3 py-1.5 rounded-lg border theme-btn-secondary text-xs">
+                      {{ t('payment.copyWalletAddress') }}
+                    </button>
+                    <span v-if="walletAddressCopied" class="text-xs text-emerald-500">{{ t('payment.copied') }}</span>
+                  </div>
+                </div>
               </div>
 
               <div v-else class="theme-surface-soft border rounded-2xl p-6">
@@ -398,6 +417,25 @@
                 <div v-if="qrUsingPayLinkFallback" class="text-xs theme-text-muted">
                   {{ t('payment.qrFallbackHint') }}
                 </div>
+                <div v-if="hasCryptoPaymentDetails" class="space-y-2 rounded-xl border theme-border bg-white/5 p-3">
+                  <div
+                    v-for="item in cryptoPaymentDetails"
+                    :key="item.key"
+                    class="flex flex-col gap-1 border-b theme-border pb-2 last:border-b-0 last:pb-0"
+                  >
+                    <span class="text-xs theme-text-muted">{{ item.label }}</span>
+                    <span class="min-w-0 font-semibold theme-text-primary break-all">
+                      {{ item.value }}
+                      <span v-if="item.detail" class="ml-1 font-normal theme-text-muted">({{ item.detail }})</span>
+                    </span>
+                  </div>
+                  <div v-if="cryptoWalletAddress" class="flex flex-wrap items-center gap-2 pt-1">
+                    <button @click="handleCopyWalletAddress" class="px-3 py-1.5 rounded-lg border theme-btn-secondary font-bold text-xs">
+                      {{ t('payment.copyWalletAddress') }}
+                    </button>
+                    <span v-if="walletAddressCopied" class="text-xs text-emerald-500">{{ t('payment.copied') }}</span>
+                  </div>
+                </div>
                 <div v-if="paymentResult.pay_url" class="pt-2 flex flex-wrap items-center gap-2">
                   <button @click="handleCopyPayLink"
                     class="px-3 py-1.5 rounded-lg border theme-btn-secondary font-bold text-xs">
@@ -514,6 +552,7 @@ const paymentResult = ref<any>(null)
 const error = ref('')
 const selectedChannelId = ref<number | null>(null)
 const copied = ref(false)
+const walletAddressCopied = ref(false)
 const capturing = ref(false)
 const redirecting = ref(false)
 const redirected = ref(false)
@@ -529,6 +568,7 @@ const pollTimer = ref<number | null>(null)
 const countdownTimer = ref<number | null>(null)
 const now = ref(appStore.getServerTime())
 const copiedTimer = ref<number | null>(null)
+const walletAddressCopiedTimer = ref<number | null>(null)
 const redirectTimer = ref<number | null>(null)
 const walletLoading = ref(false)
 const walletBalance = ref('0')
@@ -679,6 +719,67 @@ const payLinkOpenedTip = computed(() => (
 
 const payLink = computed(() => String(paymentResult.value?.pay_url || '').trim())
 const qrCodeContent = computed(() => String(paymentResult.value?.qr_code || '').trim())
+const cryptoWalletAddress = computed(() => String(paymentResult.value?.wallet_address || '').trim())
+const cryptoChainAmount = computed(() => String(paymentResult.value?.chain_amount || '').trim())
+const cryptoChain = computed(() => String(paymentResult.value?.chain || '').trim())
+const cryptoTokenID = computed(() => String(paymentResult.value?.token_id || '').trim())
+const cryptoTokenLabel = computed(() => {
+  const tokenID = cryptoTokenID.value
+  if (!tokenID) return ''
+  const parts = tokenID.split('-').filter(Boolean)
+  return String(parts[parts.length - 1] || tokenID).toUpperCase()
+})
+const cryptoTokenDetail = computed(() => {
+  if (!cryptoTokenID.value) return ''
+  return cryptoTokenID.value.toUpperCase() === cryptoTokenLabel.value ? '' : cryptoTokenID.value
+})
+const formatCryptoChain = (value: string) => {
+  const normalized = value.trim().toLowerCase()
+  const labels: Record<string, string> = {
+    tron: 'TRON',
+    trc20: 'TRON',
+    base: 'Base',
+    ethereum: 'Ethereum',
+    eth: 'Ethereum',
+    bsc: 'BNB Smart Chain',
+    polygon: 'Polygon',
+  }
+  return labels[normalized] || value
+}
+const cryptoPaymentDetails = computed(() => {
+  const details: Array<{ key: string; label: string; value: string; detail?: string }> = []
+  if (cryptoTokenLabel.value) {
+    details.push({
+      key: 'token',
+      label: t('payment.cryptoToken'),
+      value: cryptoTokenLabel.value,
+      detail: cryptoTokenDetail.value,
+    })
+  }
+  if (cryptoChain.value) {
+    details.push({
+      key: 'chain',
+      label: t('payment.cryptoChain'),
+      value: formatCryptoChain(cryptoChain.value),
+    })
+  }
+  if (cryptoChainAmount.value) {
+    details.push({
+      key: 'amount',
+      label: t('payment.cryptoAmount'),
+      value: cryptoChainAmount.value,
+    })
+  }
+  if (cryptoWalletAddress.value) {
+    details.push({
+      key: 'wallet_address',
+      label: t('payment.walletAddress'),
+      value: cryptoWalletAddress.value,
+    })
+  }
+  return details
+})
+const hasCryptoPaymentDetails = computed(() => cryptoPaymentDetails.value.length > 0)
 const qrFallbackContent = computed(() => {
   if (interactionMode.value !== 'qr') return ''
   if (qrCodeContent.value) return ''
@@ -1167,6 +1268,23 @@ const handleCopyPayLink = async () => {
     copiedTimer.value = window.setTimeout(() => {
       copied.value = false
       copiedTimer.value = null
+    }, 1500)
+  } catch (err: any) {
+    error.value = err?.message || t('payment.copyFailed')
+  }
+}
+
+const handleCopyWalletAddress = async () => {
+  if (!cryptoWalletAddress.value) return
+  try {
+    await copyText(cryptoWalletAddress.value)
+    walletAddressCopied.value = true
+    if (walletAddressCopiedTimer.value) {
+      window.clearTimeout(walletAddressCopiedTimer.value)
+    }
+    walletAddressCopiedTimer.value = window.setTimeout(() => {
+      walletAddressCopied.value = false
+      walletAddressCopiedTimer.value = null
     }, 1500)
   } catch (err: any) {
     error.value = err?.message || t('payment.copyFailed')
@@ -1726,6 +1844,10 @@ onUnmounted(() => {
   if (copiedTimer.value) {
     window.clearTimeout(copiedTimer.value)
     copiedTimer.value = null
+  }
+  if (walletAddressCopiedTimer.value) {
+    window.clearTimeout(walletAddressCopiedTimer.value)
+    walletAddressCopiedTimer.value = null
   }
   debouncedLoadOrder.cancel()
   debouncedLoadOrderPaymentChannels.cancel()
