@@ -58,6 +58,10 @@ export function useProductLabels() {
     if (status === 'unlimited') return t('products.stockStatus.unlimited')
     if (status === 'out_of_stock') return t('products.stockStatus.outOfStock')
     if (status === 'low_stock') {
+      const quantityHidden = product?.stock_quantity_hidden === true || String(product?.stock_display_mode || '').trim() !== 'exact'
+      if (quantityHidden) {
+        return t('products.stockStatus.lowStock')
+      }
       const count = Number(product?.fulfillment_type === 'manual' ? product?.manual_stock_available : product?.auto_stock_available)
       if (Number.isFinite(count) && count > 0) {
         return t('products.stockStatus.lowStockCount', { count })

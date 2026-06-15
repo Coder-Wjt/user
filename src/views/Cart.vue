@@ -282,6 +282,7 @@ const normalizeManualStockTotal = (value: unknown) => {
 const hasItemStockSnapshot = (item: CartItem) => Boolean(String(item.skuStockSnapshotAt || '').trim())
 
 const shouldEnforceItemStock = (item: CartItem) => {
+  if (item.skuStockQuantityHidden === true) return false
   if (item.fulfillmentType === 'auto') return true
   if (item.fulfillmentType === 'upstream') return true
   if (item.fulfillmentType !== 'manual') return false
@@ -294,6 +295,9 @@ const shouldEnforceItemStock = (item: CartItem) => {
 }
 
 const itemAvailableStock = (item: CartItem) => {
+  if (item.skuStockQuantityHidden === true) {
+    return item.skuStockStatus === 'out_of_stock' ? 0 : null
+  }
   if (!shouldEnforceItemStock(item)) return null
   if (item.fulfillmentType === 'upstream') {
     const upstreamStock = Number(item.skuUpstreamStock ?? 0)

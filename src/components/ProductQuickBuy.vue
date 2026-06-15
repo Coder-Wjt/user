@@ -369,6 +369,7 @@ import { useUserAuthStore } from '../stores/userAuth'
 import { useUserProfileStore } from '../stores/userProfile'
 import { getFirstImageUrl, getImageUrl } from '../utils/image'
 import { normalizeSkuId, buildSkuDisplayText } from '../utils/sku'
+import { resolveSkuAvailableStock, resolveSkuStockDisplay, type PublicStockDisplay } from '../utils/publicStock'
 import { useLocalized, useProductLabels } from '../composables/useProduct'
 import { toast } from '../composables/useToast'
 
@@ -565,6 +566,7 @@ const effectiveMin = computed(() => {
 
 const shouldEnforceSkuStock = (sku: any) => {
   if (!sku) return false
+  if (sku?.stock_quantity_hidden === true || props.product?.stock_quantity_hidden === true) return false
   if (props.product?.fulfillment_type === 'auto') return true
   if (props.product?.fulfillment_type === 'upstream') return true
   if (props.product?.fulfillment_type !== 'manual') return false
@@ -573,20 +575,9 @@ const shouldEnforceSkuStock = (sku: any) => {
 }
 
 const skuAvailableStock = (sku: any) => {
-  if (!shouldEnforceSkuStock(sku)) return null
-  if (props.product?.fulfillment_type === 'upstream') {
-    const s = Number(sku?.upstream_stock ?? 0)
-    if (s === -1) return null
-    return Math.max(s, 0)
-  }
-  if (props.product?.fulfillment_type === 'auto') {
-    const s = Number(sku?.auto_stock_available ?? 0)
-    if (s < 0) return null
-    return normalizeStockNumber(s)
-  }
-  const total = normalizeManualStockTotal(sku?.manual_stock_total)
-  if (total === -1) return null
-  return total
+  if (!sku) return 0
+  if (!shouldEnforceSkuStock(sku) && !sku?.stock_quantity_hidden) return null
+  return resolveSkuAvailableStock(props.product, sku)
 }
 
 const isSkuPurchasable = (sku: any) => {
@@ -615,25 +606,45 @@ watch(() => [props.product, props.visible], () => {
 }, { immediate: true })
 
 const skuStockText = (sku: any) => {
-  const available = skuAvailableStock(sku)
-  if (available === null) return t('productDetail.skuStockUnlimited')
-  if (available <= 0) return t('productDetail.skuStockOut')
-  return t('productDetail.skuStockRemaining', { count: available })
+  const display = resolveSkuStockDisplay(props.product, sku)
+  return formatSkuStockDisplay(display)
+}
+
+const formatSkuStockDisplay = (display: PublicStockDisplay) => {
+  switch (display.kind) {
+    case 'unlimited':
+      return t('productDetail.skuStockUnlimited')
+    case 'out':
+      return t('productDetail.skuStockOut')
+    case 'remaining':
+      return t('productDetail.skuStockRemaining', { count: display.count })
+    case 'low_stock':
+      return t('productDetail.skuStockLow')
+    case 'hidden':
+      return t('productDetail.skuStockHidden')
+    case 'range':
+      return t('productDetail.skuStockRange', { min: display.min, max: display.max })
+    case 'range_plus':
+      return t('productDetail.skuStockRangePlus', { min: display.min })
+    case 'in_stock':
+    default:
+      return t('productDetail.skuStockInStock')
+  }
 }
 
 const skuStockBadgeClass = (sku: any) => {
-  const available = skuAvailableStock(sku)
-  if (available === null) return 'border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-300'
-  if (available <= 0) return 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-700 dark:bg-rose-950/30 dark:text-rose-300'
-  if (available <= 5) return 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-300'
+  const display = resolveSkuStockDisplay(props.product, sku)
+  if (display.kind === 'unlimited' || display.kind === 'hidden') return 'border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-300'
+  if (display.kind === 'out') return 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-700 dark:bg-rose-950/30 dark:text-rose-300'
+  if (display.kind === 'low_stock' || (display.kind === 'range' && display.max <= 5)) return 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-300'
   return 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300'
 }
 
 const skuStockDotClass = (sku: any) => {
-  const available = skuAvailableStock(sku)
-  if (available === null) return 'bg-slate-400 dark:bg-slate-500'
-  if (available <= 0) return 'bg-rose-500 dark:bg-rose-400'
-  if (available <= 5) return 'bg-amber-500 dark:bg-amber-400'
+  const display = resolveSkuStockDisplay(props.product, sku)
+  if (display.kind === 'unlimited' || display.kind === 'hidden') return 'bg-slate-400 dark:bg-slate-500'
+  if (display.kind === 'out') return 'bg-rose-500 dark:bg-rose-400'
+  if (display.kind === 'low_stock' || (display.kind === 'range' && display.max <= 5)) return 'bg-amber-500 dark:bg-amber-400'
   return 'bg-emerald-500 dark:bg-emerald-400'
 }
 
@@ -744,6 +755,12 @@ const handleAddToCart = () => {
     skuManualStockSold: normalizeStockNumber(sku?.manual_stock_sold),
     skuAutoStockAvailable: normalizeStockNumber(sku?.auto_stock_available),
     skuUpstreamStock: normalizeManualStockTotal(sku?.upstream_stock),
+    skuStockStatus: String(sku?.stock_status || ''),
+    skuStockDisplayMode: String(sku?.stock_display_mode || props.product?.stock_display_mode || ''),
+    skuStockDisplay: String(sku?.stock_display || ''),
+    skuStockRangeMin: normalizeStockNumber(sku?.stock_range_min) || undefined,
+    skuStockRangeMax: normalizeStockNumber(sku?.stock_range_max) || undefined,
+    skuStockQuantityHidden: Boolean(sku?.stock_quantity_hidden || props.product?.stock_quantity_hidden),
     skuStockEnforced: shouldEnforceSkuStock(sku),
     slug: props.product.slug,
     title: props.product.title,
@@ -792,6 +809,12 @@ const handleBuyNow = () => {
     skuManualStockSold: normalizeStockNumber(sku?.manual_stock_sold),
     skuAutoStockAvailable: normalizeStockNumber(sku?.auto_stock_available),
     skuUpstreamStock: normalizeManualStockTotal(sku?.upstream_stock),
+    skuStockStatus: String(sku?.stock_status || ''),
+    skuStockDisplayMode: String(sku?.stock_display_mode || props.product?.stock_display_mode || ''),
+    skuStockDisplay: String(sku?.stock_display || ''),
+    skuStockRangeMin: normalizeStockNumber(sku?.stock_range_min) || undefined,
+    skuStockRangeMax: normalizeStockNumber(sku?.stock_range_max) || undefined,
+    skuStockQuantityHidden: Boolean(sku?.stock_quantity_hidden || props.product?.stock_quantity_hidden),
     skuStockEnforced: shouldEnforceSkuStock(sku),
     slug: props.product.slug,
     title: props.product.title,
