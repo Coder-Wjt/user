@@ -1,15 +1,11 @@
 <template>
   <div class="space-y-6">
     <div class="rounded-2xl border bg-card p-7 shadow-sm">
-      <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h2 class="text-xl font-bold text-foreground">{{ t('personalCenter.affiliate.title') }}</h2>
-          <p class="mt-1 text-sm text-muted-foreground">{{ t('personalCenter.affiliate.subtitle') }}</p>
-        </div>
-        <Badge variant="accent" size="sm">
-          {{ t('personalCenter.tabs.affiliate') }}
-        </Badge>
-      </div>
+      <PanelHeading :title="t('personalCenter.affiliate.title')" :description="t('personalCenter.affiliate.subtitle')" :icon="Megaphone">
+        <template #actions>
+          <Badge variant="accent" size="sm">{{ t('personalCenter.tabs.affiliate') }}</Badge>
+        </template>
+      </PanelHeading>
 
       <Alert v-if="panelAlert" class="mb-5" :variant="pageAlertVariant(panelAlert.level)" :class="pageAlertToneClass(panelAlert.level)">
         <AlertDescription>{{ panelAlert.message }}</AlertDescription>
@@ -21,39 +17,39 @@
 
       <template v-else-if="dashboard?.opened">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div class="rounded-xl border bg-secondary p-4 md:col-span-2">
+          <div class="rounded-xl border p-4 md:col-span-2">
             <div class="text-xs text-muted-foreground">{{ t('personalCenter.affiliate.affiliateCode') }}</div>
             <div class="mt-2 flex flex-wrap items-center gap-2">
               <span class="rounded-lg border border-border bg-muted/30 px-2 py-1 font-mono text-sm text-foreground">{{ dashboard?.affiliate_code || '-' }}</span>
-              <Button type="button" variant="secondary" size="sm" @click="copyPromotionUrl">
+              <Button type="button" variant="outline" size="sm" @click="copyPromotionUrl">
                 {{ t('personalCenter.affiliate.copyPromotionUrl') }}
               </Button>
             </div>
             <div class="mt-3 text-xs text-muted-foreground break-all">{{ promotionUrl }}</div>
           </div>
-          <div class="rounded-xl border bg-secondary p-4">
+          <div class="rounded-xl border p-4">
             <div class="text-xs text-muted-foreground">{{ t('personalCenter.affiliate.conversionRate') }}</div>
             <div class="mt-2 text-lg font-bold text-foreground">{{ conversionRateText }}</div>
             <div class="mt-2 text-xs text-muted-foreground">
               {{ t('personalCenter.affiliate.conversionDetail', { clicks: dashboard?.click_count || 0, orders: dashboard?.valid_order_count || 0 }) }}
             </div>
           </div>
-          <div class="rounded-xl border bg-secondary p-4">
+          <div class="rounded-xl border p-4">
             <div class="text-xs text-muted-foreground">{{ t('personalCenter.affiliate.pendingCommission') }}</div>
             <div class="mt-2 text-lg font-bold text-foreground">{{ dashboard?.pending_commission || '0.00' }}</div>
           </div>
-          <div class="rounded-xl border bg-secondary p-4">
+          <div class="rounded-xl border p-4">
             <div class="text-xs text-muted-foreground">{{ t('personalCenter.affiliate.availableCommission') }}</div>
             <div class="mt-2 text-lg font-bold text-foreground">{{ dashboard?.available_commission || '0.00' }}</div>
           </div>
-          <div class="rounded-xl border bg-secondary p-4">
+          <div class="rounded-xl border p-4">
             <div class="text-xs text-muted-foreground">{{ t('personalCenter.affiliate.withdrawnCommission') }}</div>
             <div class="mt-2 text-lg font-bold text-foreground">{{ dashboard?.withdrawn_commission || '0.00' }}</div>
           </div>
         </div>
       </template>
 
-      <div v-else class="rounded-xl border border-dashed bg-secondary p-5">
+      <div v-else class="rounded-xl border border-dashed p-5">
         <p class="text-sm text-muted-foreground">{{ t('personalCenter.affiliate.notOpened') }}</p>
         <Button type="button" :disabled="opening" class="mt-4 font-bold" @click="openAffiliate">
           {{ opening ? t('personalCenter.affiliate.opening') : t('personalCenter.affiliate.openButton') }}
@@ -66,7 +62,7 @@
       <p class="mt-1 text-sm text-muted-foreground">{{ t('personalCenter.affiliate.withdrawSubtitle') }}</p>
       <form class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-4" @submit.prevent="handleApplyWithdraw">
         <div>
-          <label class="mb-2 block text-sm font-medium text-muted-foreground">{{ t('personalCenter.affiliate.withdrawAmountLabel') }}</label>
+          <Label class="mb-2 block">{{ t('personalCenter.affiliate.withdrawAmountLabel') }}</Label>
           <Input
             v-model="withdrawForm.amount"
             type="text"
@@ -76,11 +72,13 @@
           />
         </div>
         <div>
-          <label class="mb-2 block text-sm font-medium text-muted-foreground">{{ t('personalCenter.affiliate.withdrawChannelLabel') }}</label>
-          <select v-if="channelOptions.length > 0" v-model="withdrawForm.channel" :class="selectClass">
-            <option value="">{{ t('personalCenter.affiliate.withdrawChannelPlaceholder') }}</option>
-            <option v-for="channel in channelOptions" :key="channel" :value="channel">{{ channel }}</option>
-          </select>
+          <Label class="mb-2 block">{{ t('personalCenter.affiliate.withdrawChannelLabel') }}</Label>
+          <Select v-if="channelOptions.length > 0" v-model="withdrawForm.channel">
+            <SelectTrigger class="h-11 w-full"><SelectValue :placeholder="t('personalCenter.affiliate.withdrawChannelPlaceholder')" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem v-for="channel in channelOptions" :key="channel" :value="channel">{{ channel }}</SelectItem>
+            </SelectContent>
+          </Select>
           <Input
             v-else
             v-model="withdrawForm.channel"
@@ -90,7 +88,7 @@
           />
         </div>
         <div>
-          <label class="mb-2 block text-sm font-medium text-muted-foreground">{{ t('personalCenter.affiliate.withdrawAccountLabel') }}</label>
+          <Label class="mb-2 block">{{ t('personalCenter.affiliate.withdrawAccountLabel') }}</Label>
           <Input
             v-model="withdrawForm.account"
             type="text"
@@ -109,7 +107,7 @@
     <div v-if="dashboard?.opened" class="rounded-2xl border bg-card p-7 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
         <h3 class="text-lg font-bold text-foreground">{{ t('personalCenter.affiliate.commissionTitle') }}</h3>
-        <Button type="button" variant="secondary" size="sm" @click="loadCommissions(commissionsPagination.page)">
+        <Button type="button" variant="outline" size="sm" @click="loadCommissions(commissionsPagination.page)">
           {{ t('orders.filters.refresh') }}
         </Button>
       </div>
@@ -117,7 +115,7 @@
       <div v-if="commissionsLoading" class="space-y-3">
         <div v-for="idx in 3" :key="idx" class="h-14 animate-pulse rounded-xl border bg-muted"></div>
       </div>
-      <div v-else-if="commissions.length === 0" class="rounded-xl border border-dashed bg-secondary px-4 py-6 text-sm text-muted-foreground">
+      <div v-else-if="commissions.length === 0" class="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
         {{ t('personalCenter.affiliate.commissionEmpty') }}
       </div>
       <div v-else class="overflow-x-auto rounded-xl border">
@@ -157,7 +155,7 @@
     <div v-if="dashboard?.opened" class="rounded-2xl border bg-card p-7 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
         <h3 class="text-lg font-bold text-foreground">{{ t('personalCenter.affiliate.withdrawRecordTitle') }}</h3>
-        <Button type="button" variant="secondary" size="sm" @click="loadWithdraws(withdrawsPagination.page)">
+        <Button type="button" variant="outline" size="sm" @click="loadWithdraws(withdrawsPagination.page)">
           {{ t('orders.filters.refresh') }}
         </Button>
       </div>
@@ -165,7 +163,7 @@
       <div v-if="withdrawsLoading" class="space-y-3">
         <div v-for="idx in 3" :key="idx" class="h-14 animate-pulse rounded-xl border bg-muted"></div>
       </div>
-      <div v-else-if="withdraws.length === 0" class="rounded-xl border border-dashed bg-secondary px-4 py-6 text-sm text-muted-foreground">
+      <div v-else-if="withdraws.length === 0" class="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
         {{ t('personalCenter.affiliate.withdrawEmpty') }}
       </div>
       <div v-else class="overflow-x-auto rounded-xl border">
@@ -207,6 +205,8 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { Megaphone } from 'lucide-vue-next'
+import PanelHeading from '../../components/shared/PanelHeading.vue'
 import { affiliateAPI, type AffiliateCommissionData, type AffiliateDashboardData, type AffiliateWithdrawData } from '../../api'
 import {
   AFFILIATE_COMMISSION_STATUS_AVAILABLE,
@@ -222,17 +222,15 @@ import { pageAlertVariant, pageAlertToneClass, type PageAlert } from '../../util
 import type { BadgeTone } from '../../utils/status'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
+import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import PaginationNav from '../../components/PaginationNav.vue'
 
 const { t } = useI18n()
 const appStore = useAppStore()
-
-// 原生渠道 select（含空值占位项）套用 Input 等价 token 样式
-const selectClass =
-  'h-11 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
 
 const loading = ref(true)
 const opening = ref(false)

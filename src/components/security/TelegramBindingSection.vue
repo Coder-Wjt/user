@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-6 rounded-2xl border border-gray-200/70 bg-gray-50/70 p-4 dark:border-white/10 dark:bg-white/5">
+  <div class="mb-6 rounded-2xl border p-4">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h3 class="text-base font-semibold text-foreground">{{ t('personalCenter.security.telegramTitle') }}</h3>
@@ -12,17 +12,17 @@
       </Badge>
     </div>
 
-    <div v-if="loadingTelegramBinding" class="mt-4 rounded-xl border border-dashed border-gray-200/80 px-4 py-4 text-sm text-muted-foreground dark:border-white/10">
+    <div v-if="loadingTelegramBinding" class="mt-4 rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">
       {{ t('personalCenter.security.telegramLoading') }}
     </div>
 
-    <div v-else-if="telegramBound" class="mt-4 space-y-4 rounded-xl border border-gray-200/80 bg-white/80 p-4 dark:border-white/10 dark:bg-white/10">
+    <div v-else-if="telegramBound" class="mt-4 space-y-4 rounded-xl border bg-card p-4">
       <div class="flex items-center gap-3">
         <img
           v-if="avatarUrl"
           :src="avatarUrl"
           alt="Telegram Avatar"
-          class="h-11 w-11 rounded-full border border-gray-200 object-cover dark:border-white/10"
+          class="h-11 w-11 rounded-full border object-cover"
         />
         <div>
           <p class="text-sm font-semibold text-foreground">{{ telegramDisplayName }}</p>
@@ -34,7 +34,7 @@
       </p>
       <Button
         type="button"
-        variant="secondary"
+        variant="outline"
         size="sm"
         :disabled="unbindingTelegram || !canUnbindTelegram"
         @click="$emit('unbind')"
@@ -44,13 +44,13 @@
       <p v-if="!canUnbindTelegram" class="text-xs text-muted-foreground">
         {{ t('personalCenter.security.telegramUnbindDisabledTip') }}
       </p>
-      <div v-if="showTelegramMiniAppEntry" class="space-y-2 rounded-xl border border-dashed border-gray-200/80 px-4 py-3 dark:border-white/10">
+      <div v-if="showTelegramMiniAppEntry" class="space-y-2 rounded-xl border border-dashed px-4 py-3">
         <p class="text-xs text-muted-foreground">
           {{ t('personalCenter.security.telegramMiniAppEntryHint') }}
         </p>
         <Button
           type="button"
-          variant="secondary"
+          variant="outline"
           size="sm"
           @click="$emit('openMiniAppEntry')"
         >
@@ -92,13 +92,13 @@
           {{ t('personalCenter.security.telegramOidcBindHint') }}
         </p>
       </div>
-      <div v-if="showTelegramMiniAppEntry" class="space-y-2 rounded-xl border border-dashed border-gray-200/80 px-4 py-3 dark:border-white/10">
+      <div v-if="showTelegramMiniAppEntry" class="space-y-2 rounded-xl border border-dashed px-4 py-3">
         <p class="text-xs text-muted-foreground">
           {{ t('personalCenter.security.telegramMiniAppEntryHint') }}
         </p>
         <Button
           type="button"
-          variant="secondary"
+          variant="outline"
           size="sm"
           @click="$emit('openMiniAppEntry')"
         >

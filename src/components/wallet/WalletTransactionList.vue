@@ -1,16 +1,17 @@
 <template>
   <div class="rounded-2xl border bg-card p-7 shadow-sm">
-    <div class="mb-4 flex items-center justify-between">
-      <h3 class="text-lg font-bold text-foreground">{{ t('personalCenter.wallet.detailTitle') }}</h3>
-      <Button type="button" variant="secondary" size="sm" @click="$emit('refresh')">
-        {{ t('orders.filters.refresh') }}
-      </Button>
-    </div>
+    <PanelHeading :title="t('personalCenter.wallet.detailTitle')" :icon="ReceiptText">
+      <template #actions>
+        <Button type="button" variant="outline" size="sm" @click="$emit('refresh')">
+          {{ t('orders.filters.refresh') }}
+        </Button>
+      </template>
+    </PanelHeading>
 
     <div v-if="loading" class="space-y-3">
       <div v-for="idx in 3" :key="idx" class="h-16 animate-pulse rounded-xl border bg-muted"></div>
     </div>
-    <div v-else-if="transactions.length === 0" class="rounded-xl border border-dashed bg-secondary px-4 py-6 text-sm text-muted-foreground">
+    <div v-else-if="transactions.length === 0" class="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
       {{ t('personalCenter.wallet.empty') }}
     </div>
     <div v-else class="overflow-x-auto rounded-xl border">
@@ -50,7 +51,7 @@
       <Button variant="outline" size="sm" :disabled="currentPage <= 1" @click="$emit('changePage', currentPage - 1)">
         {{ t('orders.prevPage') }}
       </Button>
-      <span class="rounded-full border bg-secondary text-muted-foreground px-4 py-2 text-sm">
+      <span class="rounded-full border text-muted-foreground px-4 py-2 text-sm">
         {{ t('orders.pageInfo', { page: currentPage, total: totalPages }) }}
       </span>
       <Button variant="outline" size="sm" :disabled="currentPage >= totalPages" @click="$emit('changePage', currentPage + 1)">
@@ -62,6 +63,8 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { ReceiptText } from 'lucide-vue-next'
+import PanelHeading from '../shared/PanelHeading.vue'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'

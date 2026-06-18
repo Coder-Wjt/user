@@ -1,7 +1,7 @@
 <template>
   <form class="space-y-6" @submit.prevent="$emit('submit')">
     <div>
-      <label class="mb-2 block text-sm font-medium text-foreground">{{ t('personalCenter.security.currentEmailLabel') }}</label>
+      <Label class="mb-2 block">{{ t('personalCenter.security.currentEmailLabel') }}</Label>
       <Input :model-value="currentEmailDisplay" disabled class="h-11" />
       <p v-if="!requiresOldEmailCode" class="mt-2 text-xs text-muted-foreground">
         {{ t('personalCenter.security.bindOnlyTip') }}
@@ -9,7 +9,7 @@
     </div>
 
     <div>
-      <label class="mb-2 block text-sm font-medium text-foreground">{{ t('personalCenter.security.newEmailLabel') }}</label>
+      <Label class="mb-2 block">{{ t('personalCenter.security.newEmailLabel') }}</Label>
       <Input
         :model-value="newEmail"
         @update:model-value="(v) => $emit('update:newEmail', String(v))"
@@ -21,7 +21,7 @@
 
     <div class="grid grid-cols-1 gap-4" :class="requiresOldEmailCode ? 'lg:grid-cols-2' : ''">
       <div v-if="requiresOldEmailCode">
-        <label class="mb-2 block text-sm font-medium text-foreground">{{ t('personalCenter.security.oldCodeLabel') }}</label>
+        <Label class="mb-2 block">{{ t('personalCenter.security.oldCodeLabel') }}</Label>
         <div class="flex flex-col gap-2 sm:flex-row">
           <Input
             :model-value="oldCode"
@@ -31,7 +31,7 @@
           />
           <Button
             type="button"
-            variant="secondary"
+            variant="outline"
             size="sm"
             class="h-11 whitespace-nowrap"
             :disabled="sendingCode || oldCodeCooldown > 0"
@@ -43,7 +43,7 @@
       </div>
 
       <div>
-        <label class="mb-2 block text-sm font-medium text-foreground">{{ t('personalCenter.security.newCodeLabel') }}</label>
+        <Label class="mb-2 block">{{ t('personalCenter.security.newCodeLabel') }}</Label>
         <div class="flex flex-col gap-2 sm:flex-row">
           <Input
             :model-value="newCode"
@@ -53,7 +53,7 @@
           />
           <Button
             type="button"
-            variant="secondary"
+            variant="outline"
             size="sm"
             class="h-11 whitespace-nowrap"
             :disabled="sendingCode || newCodeCooldown > 0"
@@ -65,7 +65,7 @@
       </div>
     </div>
 
-    <div class="border-t border-gray-200/70 pt-5 dark:border-white/10">
+    <div class="border-t pt-5">
       <Button type="submit" :disabled="changingEmail" class="h-11 font-bold">
         {{
           changingEmail
@@ -81,6 +81,7 @@
 import { useI18n } from 'vue-i18n'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 const { t } = useI18n()
 

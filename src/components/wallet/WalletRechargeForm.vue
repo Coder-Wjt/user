@@ -1,10 +1,9 @@
 <template>
   <div class="rounded-2xl border bg-card p-7 shadow-sm">
-    <h3 class="text-lg font-bold text-foreground">{{ t('personalCenter.wallet.rechargeTitle') }}</h3>
-    <p class="mt-1 text-sm text-muted-foreground">{{ t('personalCenter.wallet.rechargeSubtitle') }}</p>
-    <form class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-[1fr_1fr_2fr_auto]" @submit.prevent="$emit('submit')">
+    <PanelHeading :title="t('personalCenter.wallet.rechargeTitle')" :description="t('personalCenter.wallet.rechargeSubtitle')" :icon="CreditCard" />
+    <form class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_1fr_2fr_auto]" @submit.prevent="$emit('submit')">
       <div>
-        <label class="mb-2 block text-sm font-medium text-foreground">{{ t('personalCenter.wallet.amountLabel') }}</label>
+        <Label class="mb-2 block">{{ t('personalCenter.wallet.amountLabel') }}</Label>
         <Input
           :model-value="amount"
           @update:model-value="(v) => $emit('update:amount', String(v).trim())"
@@ -15,7 +14,7 @@
         />
       </div>
       <div>
-        <label class="mb-2 block text-sm font-medium text-foreground">{{ t('personalCenter.wallet.channelLabel') }}</label>
+        <Label class="mb-2 block">{{ t('personalCenter.wallet.channelLabel') }}</Label>
         <Select
           :model-value="String(channelId)"
           @update:model-value="(v) => $emit('update:channelId', Number(v))"
@@ -33,7 +32,7 @@
         </Select>
       </div>
       <div>
-        <label class="mb-2 block text-sm font-medium text-foreground">{{ t('personalCenter.wallet.remarkLabel') }}</label>
+        <Label class="mb-2 block">{{ t('personalCenter.wallet.remarkLabel') }}</Label>
         <Input
           :model-value="remark"
           @update:model-value="(v) => $emit('update:remark', String(v).trim())"
@@ -53,15 +52,15 @@
       </div>
     </form>
     <div v-if="selectedChannel" class="mt-4 grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
-      <div class="rounded-xl border bg-secondary p-4">
+      <div class="rounded-xl border p-4">
         <div class="text-xs text-muted-foreground">{{ t('payment.feeRateLabel') }}</div>
         <div class="mt-1 font-semibold text-foreground">{{ feeRateDisplay }}</div>
       </div>
-      <div class="rounded-xl border bg-secondary p-4">
+      <div class="rounded-xl border p-4">
         <div class="text-xs text-muted-foreground">{{ t('payment.fixedFeeLabel') }}</div>
         <div class="mt-1 font-semibold text-foreground">{{ fixedFeeDisplay }}</div>
       </div>
-      <div class="rounded-xl border bg-secondary p-4">
+      <div class="rounded-xl border p-4">
         <div class="text-xs text-muted-foreground">{{ t('payment.feeAmountLabel') }}</div>
         <div class="mt-1 font-semibold text-foreground">{{ feeAmountDisplay }}</div>
       </div>
@@ -77,8 +76,11 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { CreditCard } from 'lucide-vue-next'
+import PanelHeading from '../shared/PanelHeading.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 defineProps<{

@@ -66,13 +66,14 @@
           </FormField>
 
           <div class="text-center">
-            <button
+            <Button
               type="button"
-              class="text-muted-foreground transition-colors hover:text-foreground text-xs"
+              variant="link"
+              class="h-auto p-0 text-xs font-normal text-muted-foreground hover:text-foreground hover:no-underline"
               @click="totpMode = totpMode === 'code' ? 'recovery' : 'code'"
             >
               {{ totpMode === 'code' ? t('auth.login.totp.useRecovery') : t('auth.login.totp.useCode') }}
-            </button>
+            </Button>
           </div>
 
           <Alert v-if="error" variant="destructive" class="text-center">
@@ -84,13 +85,14 @@
           </Button>
 
           <div class="text-center">
-            <button
+            <Button
               type="button"
-              class="text-muted-foreground transition-colors hover:text-foreground text-xs"
+              variant="link"
+              class="h-auto p-0 text-xs font-normal text-muted-foreground hover:text-foreground hover:no-underline"
               @click="cancel2FA"
             >
               {{ t('auth.login.totp.cancel') }}
-            </button>
+            </Button>
           </div>
         </form>
 

@@ -9,14 +9,13 @@
         <p class="text-muted-foreground text-sm">{{ t('guestOrders.subtitle') }}</p>
       </div>
 
-      <div class="bg-card rounded-2xl p-6 mb-8">
+      <div class="rounded-2xl border bg-card p-6 shadow-sm mb-8">
         <div v-if="hasSavedAuth"
-          class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-muted-foreground bg-secondary border rounded-xl px-4 py-3">
+          class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-muted-foreground border rounded-xl px-4 py-3">
           <span>{{ t('guestOrders.savedHint', { email: savedAuth.email || '-' }) }}</span>
-          <button type="button" @click="clearSaved"
-            class="text-muted-foreground transition-colors hover:text-foreground text-xs underline decoration-gray-300 dark:decoration-white/20">
+          <Button type="button" variant="link" class="h-auto p-0 text-xs font-normal text-muted-foreground hover:text-foreground" @click="clearSaved">
             {{ t('guestOrders.clearSaved') }}
-          </button>
+          </Button>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Input v-model="email" type="email" class="h-11" :placeholder="t('guestOrders.emailPlaceholder')" />
@@ -41,7 +40,7 @@
 
       <div v-else class="space-y-4">
         <div v-for="order in orders" :key="order.order_no"
-          class="bg-card rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          class="rounded-2xl border bg-card p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div class="text-xs uppercase tracking-wider text-muted-foreground">{{ t('orders.orderNo') }}：{{ order.order_no }}</div>
             <div class="text-lg font-bold text-foreground mt-1">{{ formatMoney(order.total_amount,
@@ -61,7 +60,7 @@
             <Badge :variant="statusVariant(order.status)" size="sm">
               {{ statusLabel(order.status) }}
             </Badge>
-            <Button as-child variant="secondary" size="sm">
+            <Button as-child variant="outline" size="sm">
               <router-link :to="`/guest/orders/${order.order_no}`">
                 <Eye class="h-4 w-4 opacity-60" />
                 {{ t('guestOrders.viewDetails') }}

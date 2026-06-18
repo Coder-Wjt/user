@@ -2,10 +2,10 @@
   <div class="min-h-screen bg-background text-foreground pt-20 pb-16">
     <div class="container mx-auto px-4">
       <Card class="max-w-3xl mx-auto mt-12 backdrop-blur-xl rounded-3xl p-8 md:p-12 text-center">
-        <p class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-secondary border text-muted-foreground">
+        <Badge variant="neutral" class="rounded-full gap-1.5 px-3 py-1 text-xs">
           <Info class="w-3.5 h-3.5 opacity-60" />
           {{ brandSiteName }}
-        </p>
+        </Badge>
         <div class="my-4 flex justify-center">
           <Frown class="w-20 h-20 md:w-24 md:h-24 text-muted-foreground opacity-30" :stroke-width="1" />
         </div>
@@ -66,6 +66,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ArrowLeft, Bell, BookOpen, Frown, Home, Info, ShoppingBag } from 'lucide-vue-next'
 import { useAppStore } from '../stores/app'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 

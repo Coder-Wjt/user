@@ -1,22 +1,15 @@
 <template>
   <div class="space-y-4">
-    <div class="rounded-2xl border bg-card p-6 shadow-sm">
-      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h2 class="text-xl font-bold text-foreground">{{ t('orders.title') }}</h2>
-          <p class="mt-1 text-sm text-muted-foreground">{{ t('orders.subtitle') }}</p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2">
-          <Badge variant="neutral" size="sm" class="rounded-full">
-            {{ t('orders.pageInfo', { page: activePagination.page, total: activePagination.total_page }) }}
-          </Badge>
-          <Button as-child variant="ghost" size="sm" class="rounded-full">
-            <router-link to="/products">{{ t('orders.continueShopping') }}</router-link>
-          </Button>
-        </div>
-      </div>
-    </div>
+    <PanelHeading :title="t('orders.title')" :description="t('orders.subtitle')" :icon="ShoppingBag">
+      <template #actions>
+        <Badge variant="neutral" size="sm" class="rounded-full">
+          {{ t('orders.pageInfo', { page: activePagination.page, total: activePagination.total_page }) }}
+        </Badge>
+        <Button as-child variant="ghost" size="sm" class="rounded-full">
+          <router-link to="/products">{{ t('orders.continueShopping') }}</router-link>
+        </Button>
+      </template>
+    </PanelHeading>
 
     <!-- Tab 切换 -->
     <div class="flex rounded-xl border bg-card overflow-hidden">
@@ -41,28 +34,16 @@
     <!-- 普通订单 Tab -->
     <template v-if="activeTab === 'product'">
       <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <div class="rounded-2xl border bg-card p-4">
-          <div class="text-xs text-muted-foreground">{{ t('orders.stats.totalMatched') }}</div>
-          <div class="mt-2 text-xl font-bold text-foreground">{{ orderPagination.total }}</div>
-        </div>
-        <div class="rounded-2xl border bg-card p-4">
-          <div class="text-xs text-muted-foreground">{{ t('orders.stats.currentPage') }}</div>
-          <div class="mt-2 text-xl font-bold text-foreground">{{ orders.length }}</div>
-        </div>
-        <div class="rounded-2xl border bg-card p-4">
-          <div class="text-xs">{{ t('orders.stats.pendingPayment') }}</div>
-          <div class="mt-2 text-xl font-bold">{{ pendingPaymentCount }}</div>
-        </div>
-        <div class="rounded-2xl border bg-card p-4">
-          <div class="text-xs">{{ t('orders.stats.finished') }}</div>
-          <div class="mt-2 text-xl font-bold">{{ finishedCount }}</div>
-        </div>
+        <StatCard :label="t('orders.stats.totalMatched')" :value="orderPagination.total" :icon="ShoppingBag" tone="info" mono />
+        <StatCard :label="t('orders.stats.currentPage')" :value="orders.length" :icon="Layers" tone="neutral" mono />
+        <StatCard :label="t('orders.stats.pendingPayment')" :value="pendingPaymentCount" :icon="Clock" tone="warning" mono />
+        <StatCard :label="t('orders.stats.finished')" :value="finishedCount" :icon="CheckCircle2" tone="success" mono />
       </div>
 
       <div class="rounded-2xl border bg-card p-4 shadow-sm">
         <div class="flex flex-col gap-3 lg:flex-row lg:items-end">
           <div class="w-full lg:max-w-sm">
-            <label class="mb-1 block text-xs font-semibold text-muted-foreground">{{ t('orders.filters.keyword') }}</label>
+            <Label class="mb-1 block text-xs font-semibold text-muted-foreground">{{ t('orders.filters.keyword') }}</Label>
             <Input
               v-model="orderFilters.orderNo"
               type="text"
@@ -74,26 +55,25 @@
           </div>
 
           <div class="w-full lg:w-56">
-            <label class="mb-1 block text-xs font-semibold text-muted-foreground">{{ t('orders.filters.status') }}</label>
-            <select
-              v-model="orderFilters.status"
-              :class="selectClass"
-              @change="handleOrderStatusChange"
-            >
-              <option v-for="item in orderStatusOptions" :key="item.value || 'all'" :value="item.value">
-                {{ item.label }}
-              </option>
-            </select>
+            <Label class="mb-1 block text-xs font-semibold text-muted-foreground">{{ t('orders.filters.status') }}</Label>
+            <Select v-model="orderStatusProxy">
+              <SelectTrigger class="h-11 w-full"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="item in orderStatusOptions" :key="item.value || 'all'" :value="item.value || 'all'">
+                  {{ item.label }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div class="flex w-full flex-wrap items-center gap-2 lg:w-auto">
             <Button type="button" class="h-11 font-bold" @click="applyOrderFilters">
               {{ t('orders.filters.search') }}
             </Button>
-            <Button type="button" variant="secondary" class="h-11 font-semibold" @click="resetOrderFilters">
+            <Button type="button" variant="outline" class="h-11 font-semibold" @click="resetOrderFilters">
               {{ t('orders.filters.reset') }}
             </Button>
-            <Button type="button" variant="secondary" class="h-11 font-semibold" @click="refreshOrdersCurrentPage">
+            <Button type="button" variant="outline" class="h-11 font-semibold" @click="refreshOrdersCurrentPage">
               {{ t('orders.filters.refresh') }}
             </Button>
           </div>
@@ -141,7 +121,7 @@
               <Badge :variant="statusVariant(order.status)" size="sm">
                 {{ statusLabel(order.status) }}
               </Badge>
-              <Button as-child variant="secondary" size="sm">
+              <Button as-child variant="outline" size="sm">
                 <router-link :to="`/orders/${order.order_no}`">{{ t('orders.viewDetails') }}</router-link>
               </Button>
               <Button v-if="order.status === 'pending_payment'" as-child size="sm">
@@ -164,24 +144,15 @@
     <!-- 充值订单 Tab -->
     <template v-if="activeTab === 'recharge'">
       <div class="grid grid-cols-2 gap-3 lg:grid-cols-3">
-        <div class="rounded-2xl border bg-card p-4">
-          <div class="text-xs text-muted-foreground">{{ t('orders.stats.totalMatched') }}</div>
-          <div class="mt-2 text-xl font-bold text-foreground">{{ rechargePagination.total }}</div>
-        </div>
-        <div class="rounded-2xl border bg-card p-4">
-          <div class="text-xs text-muted-foreground">{{ t('orders.stats.currentPage') }}</div>
-          <div class="mt-2 text-xl font-bold text-foreground">{{ rechargeOrders.length }}</div>
-        </div>
-        <div class="rounded-2xl border bg-card p-4">
-          <div class="text-xs">{{ t('orders.stats.pendingPayment') }}</div>
-          <div class="mt-2 text-xl font-bold">{{ rechargePendingCount }}</div>
-        </div>
+        <StatCard :label="t('orders.stats.totalMatched')" :value="rechargePagination.total" :icon="Wallet" tone="info" mono />
+        <StatCard :label="t('orders.stats.currentPage')" :value="rechargeOrders.length" :icon="Layers" tone="neutral" mono />
+        <StatCard :label="t('orders.stats.pendingPayment')" :value="rechargePendingCount" :icon="Clock" tone="warning" mono />
       </div>
 
       <div class="rounded-2xl border bg-card p-4 shadow-sm">
         <div class="flex flex-col gap-3 lg:flex-row lg:items-end">
           <div class="w-full lg:max-w-sm">
-            <label class="mb-1 block text-xs font-semibold text-muted-foreground">{{ t('orders.rechargeFilters.keyword') }}</label>
+            <Label class="mb-1 block text-xs font-semibold text-muted-foreground">{{ t('orders.rechargeFilters.keyword') }}</Label>
             <Input
               v-model="rechargeFilters.rechargeNo"
               type="text"
@@ -193,26 +164,25 @@
           </div>
 
           <div class="w-full lg:w-56">
-            <label class="mb-1 block text-xs font-semibold text-muted-foreground">{{ t('orders.filters.status') }}</label>
-            <select
-              v-model="rechargeFilters.status"
-              :class="selectClass"
-              @change="handleRechargeStatusChange"
-            >
-              <option v-for="item in rechargeStatusOptions" :key="item.value || 'all'" :value="item.value">
-                {{ item.label }}
-              </option>
-            </select>
+            <Label class="mb-1 block text-xs font-semibold text-muted-foreground">{{ t('orders.filters.status') }}</Label>
+            <Select v-model="rechargeStatusProxy">
+              <SelectTrigger class="h-11 w-full"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem v-for="item in rechargeStatusOptions" :key="item.value || 'all'" :value="item.value || 'all'">
+                  {{ item.label }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div class="flex w-full flex-wrap items-center gap-2 lg:w-auto">
             <Button type="button" class="h-11 font-bold" @click="applyRechargeFilters">
               {{ t('orders.filters.search') }}
             </Button>
-            <Button type="button" variant="secondary" class="h-11 font-semibold" @click="resetRechargeFilters">
+            <Button type="button" variant="outline" class="h-11 font-semibold" @click="resetRechargeFilters">
               {{ t('orders.filters.reset') }}
             </Button>
-            <Button type="button" variant="secondary" class="h-11 font-semibold" @click="refreshRechargeCurrentPage">
+            <Button type="button" variant="outline" class="h-11 font-semibold" @click="refreshRechargeCurrentPage">
               {{ t('orders.filters.refresh') }}
             </Button>
           </div>
@@ -251,7 +221,7 @@
               <Badge :variant="rechargeStatusVariant(ro.status)" size="sm">
                 {{ rechargeStatusText(ro.status) }}
               </Badge>
-              <Button as-child variant="secondary" size="sm">
+              <Button as-child variant="outline" size="sm">
                 <router-link :to="`/recharge-orders/${ro.recharge_no}`">{{ t('orders.viewDetails') }}</router-link>
               </Button>
               <Button v-if="ro.status === 'pending'" as-child size="sm">
@@ -276,6 +246,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { ShoppingBag, Layers, Clock, CheckCircle2, Wallet } from 'lucide-vue-next'
 import { userOrderAPI } from '../../api'
 import { walletAPI } from '../../api/wallet'
 import { orderStatusVariant, orderStatusLabel, type BadgeTone } from '../../utils/status'
@@ -283,15 +254,16 @@ import { debounceAsync } from '../../utils/debounce'
 import { amountToCents } from '../../utils/money'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import EmptyState from '../../components/EmptyState.vue'
 import PaginationNav from '../../components/PaginationNav.vue'
+import PanelHeading from '../../components/shared/PanelHeading.vue'
+import StatCard from '../../components/shared/StatCard.vue'
 
 const { t } = useI18n()
 
-// 原生筛选 select（含空值"全部"选项）套用 Input 等价 token 样式
-const selectClass =
-  'h-11 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
 
 // ========== Tab 状态 ==========
 const activeTab = ref<'product' | 'recharge'>('product')
@@ -386,6 +358,13 @@ const changeOrderPage = (page: number) => {
 const applyOrderFilters = () => loadOrders(1)
 const handleOrderNoInput = () => debouncedLoadOrders(1)
 const handleOrderStatusChange = () => loadOrders(1)
+const orderStatusProxy = computed({
+  get: () => orderFilters.status || 'all',
+  set: (v: string) => {
+    orderFilters.status = v === 'all' ? '' : v
+    handleOrderStatusChange()
+  },
+})
 const resetOrderFilters = () => {
   orderFilters.orderNo = ''
   orderFilters.status = ''
@@ -453,6 +432,13 @@ const changeRechargePage = (page: number) => {
 const applyRechargeFilters = () => loadRechargeOrders(1)
 const handleRechargeNoInput = () => debouncedLoadRechargeOrders(1)
 const handleRechargeStatusChange = () => loadRechargeOrders(1)
+const rechargeStatusProxy = computed({
+  get: () => rechargeFilters.status || 'all',
+  set: (v: string) => {
+    rechargeFilters.status = v === 'all' ? '' : v
+    handleRechargeStatusChange()
+  },
+})
 const resetRechargeFilters = () => {
   rechargeFilters.rechargeNo = ''
   rechargeFilters.status = ''

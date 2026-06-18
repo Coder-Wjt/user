@@ -176,9 +176,9 @@
                 {{ t('products.wholesaleRulesTitle') }}
               </div>
               <div class="flex flex-wrap gap-1">
-                <span v-for="tier in getWholesalePrices(product)" :key="tier.min_quantity" class="rounded-full border border-emerald-200 bg-white/70 px-2 py-0.5 text-[10px] text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+                <Badge v-for="tier in getWholesalePrices(product)" :key="tier.min_quantity" variant="success" size="xs" class="rounded-full">
                   {{ formatWholesaleTier(tier) }}
-                </span>
+                </Badge>
               </div>
             </div>
 

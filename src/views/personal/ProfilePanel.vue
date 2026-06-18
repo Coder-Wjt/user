@@ -1,14 +1,10 @@
 <template>
   <div class="rounded-2xl border bg-card p-7 shadow-sm">
-    <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div>
-        <h2 class="text-xl font-bold text-foreground">{{ t('personalCenter.profile.title') }}</h2>
-        <p class="mt-1 text-sm text-muted-foreground">{{ t('personalCenter.profile.subtitle') }}</p>
-      </div>
-      <Badge variant="accent" size="sm">
-        {{ t('personalCenter.tabs.profile') }}
-      </Badge>
-    </div>
+    <PanelHeading :title="t('personalCenter.profile.title')" :description="t('personalCenter.profile.subtitle')" :icon="UserCircle">
+      <template #actions>
+        <Badge variant="accent" size="sm">{{ t('personalCenter.tabs.profile') }}</Badge>
+      </template>
+    </PanelHeading>
 
     <Alert v-if="profileAlert" class="mb-5" :variant="pageAlertVariant(profileAlert.level)" :class="pageAlertToneClass(profileAlert.level)">
       <AlertDescription>{{ profileAlert.message }}</AlertDescription>
@@ -17,12 +13,12 @@
     <form class="space-y-6" @submit.prevent="handleSaveProfile">
       <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div class="md:col-span-2">
-          <label class="mb-2 block text-sm font-medium text-foreground">{{ t('personalCenter.profile.emailLabel') }}</label>
+          <Label class="mb-2 block">{{ t('personalCenter.profile.emailLabel') }}</Label>
           <Input :model-value="userProfileStore.profile?.email || ''" disabled class="h-11" />
         </div>
 
         <div>
-          <label class="mb-2 block text-sm font-medium text-foreground">{{ t('personalCenter.profile.nicknameLabel') }}</label>
+          <Label class="mb-2 block">{{ t('personalCenter.profile.nicknameLabel') }}</Label>
           <Input
             v-model="profileForm.nickname"
             :placeholder="t('personalCenter.profile.nicknamePlaceholder')"
@@ -31,7 +27,7 @@
         </div>
 
         <div>
-          <label class="mb-2 block text-sm font-medium text-foreground">{{ t('personalCenter.profile.localeLabel') }}</label>
+          <Label class="mb-2 block">{{ t('personalCenter.profile.localeLabel') }}</Label>
           <Select v-model="profileForm.locale">
             <SelectTrigger class="h-11 w-full">
               <SelectValue />
@@ -45,7 +41,7 @@
         </div>
       </div>
 
-      <div class="flex flex-col gap-3 border-t border-gray-200/70 pt-5 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex flex-col gap-3 border-t pt-5 sm:flex-row sm:items-center sm:justify-between">
         <p class="text-xs text-muted-foreground">{{ t('personalCenter.profile.subtitle') }}</p>
         <Button type="submit" :disabled="userProfileStore.savingProfile" class="h-11 font-bold">
           {{ userProfileStore.savingProfile ? t('personalCenter.profile.saving') : t('personalCenter.profile.save') }}
@@ -58,10 +54,13 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { UserCircle } from 'lucide-vue-next'
 import { pageAlertVariant, pageAlertToneClass, type PageAlert } from '../../utils/alerts'
 import { useUserProfileStore } from '../../stores/userProfile'
+import PanelHeading from '../../components/shared/PanelHeading.vue'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
+import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'

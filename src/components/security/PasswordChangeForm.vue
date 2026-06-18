@@ -9,7 +9,7 @@
 
     <form class="mt-6 space-y-6" @submit.prevent="$emit('submit')">
       <div v-if="requiresOldPassword">
-        <label class="mb-2 block text-sm font-medium text-foreground">{{ t('personalCenter.security.currentPasswordLabel') }}</label>
+        <Label class="mb-2 block">{{ t('personalCenter.security.currentPasswordLabel') }}</Label>
         <Input
           :model-value="oldPassword"
           @update:model-value="(v) => $emit('update:oldPassword', String(v))"
@@ -21,7 +21,7 @@
 
       <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div>
-          <label class="mb-2 block text-sm font-medium text-foreground">{{ t('personalCenter.security.newPasswordLabel') }}</label>
+          <Label class="mb-2 block">{{ t('personalCenter.security.newPasswordLabel') }}</Label>
           <Input
             :model-value="newPassword"
             @update:model-value="(v) => $emit('update:newPassword', String(v))"
@@ -32,7 +32,7 @@
         </div>
 
         <div>
-          <label class="mb-2 block text-sm font-medium text-foreground">{{ t('personalCenter.security.confirmPasswordLabel') }}</label>
+          <Label class="mb-2 block">{{ t('personalCenter.security.confirmPasswordLabel') }}</Label>
           <Input
             :model-value="confirmPassword"
             @update:model-value="(v) => $emit('update:confirmPassword', String(v))"
@@ -43,8 +43,8 @@
         </div>
       </div>
 
-      <div class="border-t border-gray-200/70 pt-5 dark:border-white/10">
-        <Button type="submit" variant="secondary" :disabled="changingPassword" class="h-11">
+      <div class="border-t pt-5">
+        <Button type="submit" variant="outline" :disabled="changingPassword" class="h-11">
           {{
             changingPassword
               ? (requiresOldPassword ? t('personalCenter.security.changePasswordSubmitting') : t('personalCenter.security.setPasswordSubmitting'))
@@ -60,6 +60,7 @@
 import { useI18n } from 'vue-i18n'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 const { t } = useI18n()
 

@@ -6,13 +6,13 @@
           <h1 class="text-3xl font-black text-foreground mb-2">{{ t('guestOrderDetail.title') }}</h1>
           <p class="text-muted-foreground text-sm">{{ t('guestOrderDetail.subtitle') }}</p>
         </div>
-        <router-link to="/guest/orders"
-          class="text-muted-foreground transition-colors hover:text-foreground text-sm transition-colors">{{
-            t('guestOrderDetail.backSearch') }}</router-link>
+        <Button as-child variant="link" class="h-auto p-0 text-sm font-normal text-muted-foreground hover:text-foreground">
+          <router-link to="/guest/orders">{{ t('guestOrderDetail.backSearch') }}</router-link>
+        </Button>
       </div>
 
       <div v-if="showAuthForm"
-        class="bg-card rounded-2xl p-6 mb-6">
+        class="rounded-2xl border bg-card p-6 shadow-sm mb-6">
         <h2 class="text-lg font-bold mb-2">{{ t('guestOrderDetail.authTitle') }}</h2>
         <p class="text-xs text-muted-foreground mb-4">{{ t('guestOrderDetail.authHint') }}</p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -26,10 +26,9 @@
           <Button class="font-bold" @click="handleAuthSubmit">
             {{ t('guestOrderDetail.authSubmit') }}
           </Button>
-          <button type="button" @click="clearAuth"
-            class="text-xs text-muted-foreground transition-colors hover:text-foreground underline decoration-gray-300 dark:decoration-white/20">
+          <Button type="button" variant="link" class="h-auto p-0 text-xs font-normal text-muted-foreground hover:text-foreground" @click="clearAuth">
             {{ t('guestOrderDetail.authClear') }}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -38,12 +37,12 @@
       </div>
 
       <div v-else-if="!order && !showAuthForm"
-        class="bg-card rounded-2xl p-12 text-center">
+        class="rounded-2xl border bg-card shadow-sm p-12 text-center">
         <p class="text-muted-foreground">{{ t('guestOrderDetail.notFound') }}</p>
       </div>
 
       <div v-else class="space-y-6">
-        <div class="bg-card rounded-2xl p-6">
+        <div class="rounded-2xl border bg-card shadow-sm p-6">
           <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <div class="text-xs uppercase tracking-wider text-muted-foreground">{{ t('orders.orderNo') }}</div>
@@ -66,15 +65,15 @@
           </div>
         </div>
 
-        <div class="bg-card rounded-2xl p-6">
+        <div class="rounded-2xl border bg-card shadow-sm p-6">
           <h2 class="text-lg font-bold mb-4">{{ t('orderDetail.amountTitle') }}</h2>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div class="bg-secondary border rounded-xl p-4">
+            <div class="border rounded-xl p-4">
               <div class="text-xs text-muted-foreground">{{ t('orderDetail.amountOriginal') }}</div>
               <div class="text-foreground font-mono mt-1">{{ formatMoney(order.original_amount,
                 order.currency) }}</div>
             </div>
-            <div class="bg-secondary border rounded-xl p-4">
+            <div class="border rounded-xl p-4">
               <div class="text-xs text-muted-foreground">{{ t('orderDetail.amountDiscount') }}</div>
               <div
                 class="font-mono mt-1"
@@ -83,7 +82,7 @@
                 {{ formatDiscountMoney(order.discount_amount, order.currency) }}
               </div>
             </div>
-            <div class="bg-secondary border rounded-xl p-4">
+            <div class="border rounded-xl p-4">
               <div class="text-xs text-muted-foreground">{{ t('orderDetail.amountTotal') }}</div>
               <div class="text-foreground font-mono mt-1">{{ formatMoney(order.total_amount,
                 order.currency) }}</div>
@@ -101,7 +100,7 @@
           </div>
         </div>
 
-        <div v-if="showRefundRecordsCard" class="bg-card rounded-2xl p-6">
+        <div v-if="showRefundRecordsCard" class="rounded-2xl border bg-card shadow-sm p-6">
           <h2 class="text-lg font-bold mb-4">{{ t('orderDetail.refundRecordsTitle') }}</h2>
           <div v-if="refundRecords.length > 0" class="overflow-x-auto rounded-xl border">
             <Table>
@@ -127,29 +126,29 @@
           <div v-else class="text-sm text-muted-foreground">{{ t('orderDetail.refundRecordsEmpty') }}</div>
         </div>
 
-        <div v-if="showTimeCard" class="bg-card rounded-2xl p-6">
+        <div v-if="showTimeCard" class="rounded-2xl border bg-card shadow-sm p-6">
           <h2 class="text-lg font-bold mb-4">{{ t('orderDetail.timeTitle') }}</h2>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div class="bg-secondary border rounded-xl p-4">
+            <div class="border rounded-xl p-4">
               <div class="text-xs text-muted-foreground">{{ t('orderDetail.createdAtLabel') }}</div>
               <div class="text-foreground mt-1">{{ formatDate(order.created_at) }}</div>
             </div>
-            <div v-if="order.paid_at" class="bg-secondary border rounded-xl p-4">
+            <div v-if="order.paid_at" class="border rounded-xl p-4">
               <div class="text-xs text-muted-foreground">{{ t('orderDetail.paidAtLabel') }}</div>
               <div class="text-foreground mt-1">{{ formatDate(order.paid_at) }}</div>
             </div>
-            <div v-if="order.expires_at" class="bg-secondary border rounded-xl p-4">
+            <div v-if="order.expires_at" class="border rounded-xl p-4">
               <div class="text-xs text-muted-foreground">{{ t('orderDetail.expiresAtLabel') }}</div>
               <div class="text-foreground mt-1">{{ formatDate(order.expires_at) }}</div>
             </div>
-            <div v-if="order.canceled_at" class="bg-secondary border rounded-xl p-4">
+            <div v-if="order.canceled_at" class="border rounded-xl p-4">
               <div class="text-xs text-muted-foreground">{{ t('orderDetail.canceledAtLabel') }}</div>
               <div class="text-foreground mt-1">{{ formatDate(order.canceled_at) }}</div>
             </div>
           </div>
         </div>
 
-        <div class="bg-card rounded-2xl p-6">
+        <div class="rounded-2xl border bg-card shadow-sm p-6">
           <h2 class="text-lg font-bold mb-4">{{ t('orderDetail.itemsTitle') }}</h2>
           <div v-if="order.items && order.items.length > 0" class="space-y-4">
             <div v-for="(item, idx) in order.items" :key="idx"
@@ -176,10 +175,7 @@
                     {{ t('orderDetail.itemFulfillmentLabel') }}：{{ fulfillmentTypeLabelText(item.fulfillment_type) }}
                   </div>
                   <div v-if="item.tags && item.tags.length" class="mt-2 flex flex-wrap gap-2">
-                    <span v-for="(tag, index) in item.tags" :key="index"
-                      class="px-2 py-0.5 text-[11px] rounded-full bg-muted border text-muted-foreground">
-                      {{ tag }}
-                    </span>
+                    <Badge v-for="(tag, index) in item.tags" :key="index" variant="neutral" size="sm" class="rounded-full">{{ tag }}</Badge>
                   </div>
                   <div v-if="manualSubmissionRows(item.manual_form_submission, item.manual_form_schema_snapshot).length"
                     class="mt-3 rounded-xl border border-gray-200 bg-white p-3 text-xs text-gray-600 dark:border-white/10 dark:bg-black/30 dark:text-gray-300">
@@ -221,11 +217,11 @@
         </div>
 
         <div v-if="order.children && order.children.length > 0"
-          class="bg-card rounded-2xl p-6">
+          class="rounded-2xl border bg-card shadow-sm p-6">
           <h2 class="text-lg font-bold mb-4">{{ t('orderDetail.childOrdersTitle') }}</h2>
           <div class="space-y-4">
             <div v-for="child in order.children" :key="child.id"
-              class="bg-secondary border rounded-2xl p-4">
+              class="border rounded-2xl p-4">
               <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div>
                   <div class="text-sm text-muted-foreground">{{ t('orderDetail.childOrderNo') }}：{{ child.order_no }}</div>
@@ -264,10 +260,7 @@
                           {{ t('orderDetail.itemFulfillmentLabel') }}：{{ fulfillmentTypeLabelText(item.fulfillment_type) }}
                         </div>
                         <div v-if="item.tags && item.tags.length" class="mt-2 flex flex-wrap gap-2">
-                          <span v-for="(tag, index) in item.tags" :key="index"
-                            class="px-2 py-0.5 text-[11px] rounded-full bg-muted border text-muted-foreground">
-                            {{ tag }}
-                          </span>
+                          <Badge v-for="(tag, index) in item.tags" :key="index" variant="neutral" size="sm" class="rounded-full">{{ tag }}</Badge>
                         </div>
                         <div v-if="manualSubmissionRows(item.manual_form_submission, item.manual_form_schema_snapshot).length"
                           class="mt-3 rounded-xl border border-gray-200 bg-white p-3 text-xs text-gray-600 dark:border-white/10 dark:bg-black/30 dark:text-gray-300">
@@ -337,14 +330,14 @@
                     <div class="mb-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
                       {{ t('orderDetail.fulfillmentTruncatedHint') }}
                     </div>
-                    <div class="bg-secondary border rounded-xl p-4 text-sm text-muted-foreground whitespace-pre-wrap break-all overflow-hidden max-h-48 overflow-y-auto">{{ child.fulfillment.payload }}</div>
+                    <div class="border rounded-xl p-4 text-sm text-muted-foreground whitespace-pre-wrap break-all overflow-hidden max-h-48 overflow-y-auto">{{ child.fulfillment.payload }}</div>
                   </div>
                   <div v-else-if="fulfillmentDeliveryLines(child.fulfillment).length"
-                    class="mt-3 bg-secondary border rounded-xl p-4 text-sm text-muted-foreground space-y-1 break-all overflow-hidden">
+                    class="mt-3 border rounded-xl p-4 text-sm text-muted-foreground space-y-1 break-all overflow-hidden">
                     <div v-for="(line, index) in fulfillmentDeliveryLines(child.fulfillment)" :key="`child-fulfillment-${child.id}-${index}`">{{ line }}</div>
                   </div>
                   <div v-else-if="child.fulfillment.payload"
-                    class="mt-3 bg-secondary border rounded-xl p-4 text-sm text-muted-foreground whitespace-pre-wrap break-all overflow-hidden">
+                    class="mt-3 border rounded-xl p-4 text-sm text-muted-foreground whitespace-pre-wrap break-all overflow-hidden">
                     {{ child.fulfillment.payload }}
                   </div>
                   <div v-if="child.fulfillment.status === 'delivered' && instructionBlocks(child.items).length"
@@ -366,7 +359,7 @@
         </div>
 
         <div v-if="order.fulfillment"
-          class="bg-card rounded-2xl p-6">
+          class="rounded-2xl border bg-card shadow-sm p-6">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold">{{ t('orderDetail.fulfillmentTitle') }}</h2>
             <div class="flex items-center gap-2">
@@ -396,14 +389,14 @@
             <div class="mb-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
               {{ t('orderDetail.fulfillmentTruncatedHint') }}
             </div>
-            <div class="bg-secondary border rounded-xl p-4 text-sm text-muted-foreground whitespace-pre-wrap break-all overflow-hidden max-h-64 overflow-y-auto">{{ order.fulfillment.payload }}</div>
+            <div class="border rounded-xl p-4 text-sm text-muted-foreground whitespace-pre-wrap break-all overflow-hidden max-h-64 overflow-y-auto">{{ order.fulfillment.payload }}</div>
           </div>
           <div v-else-if="fulfillmentDeliveryLines(order.fulfillment).length"
-            class="mt-4 bg-secondary border rounded-xl p-4 text-sm text-muted-foreground space-y-1 break-all overflow-hidden">
+            class="mt-4 border rounded-xl p-4 text-sm text-muted-foreground space-y-1 break-all overflow-hidden">
             <div v-for="(line, index) in fulfillmentDeliveryLines(order.fulfillment)" :key="`fulfillment-${order.order_no || 'order'}-${index}`">{{ line }}</div>
           </div>
           <div v-else
-            class="mt-4 bg-secondary border rounded-xl p-4 text-sm text-muted-foreground whitespace-pre-wrap break-all overflow-hidden">
+            class="mt-4 border rounded-xl p-4 text-sm text-muted-foreground whitespace-pre-wrap break-all overflow-hidden">
             {{ order.fulfillment.payload }}
           </div>
           <div v-if="order.fulfillment.status === 'delivered' && instructionBlocks(order.items).length"

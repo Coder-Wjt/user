@@ -1,79 +1,70 @@
 <template>
   <div class="relative min-h-screen overflow-hidden bg-background text-foreground pt-24 pb-16">
     <div class="container relative z-10 mx-auto px-4">
-      <header class="mb-8 rounded-3xl border bg-card p-6 shadow-xl backdrop-blur-sm lg:p-8">
-        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-              {{ t('personalCenter.title') }}
-            </p>
-            <h1 class="mt-3 text-3xl font-black text-foreground lg:text-[2.1rem]">{{ userProfileStore.displayName }}</h1>
-            <p class="mt-2 text-sm text-muted-foreground">{{ t('personalCenter.subtitle') }}</p>
+      <header class="relative mb-8 overflow-hidden rounded-3xl border bg-card shadow-sm">
+        <div class="relative flex flex-col gap-6 p-6 lg:flex-row lg:items-center lg:justify-between lg:p-8">
+          <div class="flex min-w-0 items-center gap-4">
+            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-2xl font-black text-primary">
+              {{ displayInitial }}
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                {{ t('personalCenter.title') }}
+              </p>
+              <h1 class="mt-1.5 truncate text-2xl font-black text-foreground lg:text-[2rem]">{{ userProfileStore.displayName }}</h1>
+              <p class="mt-1 truncate text-sm text-muted-foreground">{{ userProfileStore.profile?.email || t('personalCenter.subtitle') }}</p>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:w-auto">
-            <div class="rounded-2xl border bg-secondary px-4 py-3">
-              <p class="text-[11px] uppercase tracking-[0.16em] text-gray-400">{{ t('personalCenter.memberLevel.currentLevel') }}</p>
-              <p class="mt-2 flex items-center gap-1.5 text-sm font-semibold text-muted-foreground">
-                <img v-if="isImagePath(userProfileStore.currentLevel?.icon)" :src="getImageUrl(userProfileStore.currentLevel!.icon)" class="h-4 w-4 object-contain" alt="" />
-                <span v-else-if="userProfileStore.currentLevel?.icon">{{ userProfileStore.currentLevel.icon }}</span>
-                <span>{{ levelName(userProfileStore.currentLevel) }}</span>
-              </p>
-            </div>
-            <div class="rounded-2xl border bg-secondary px-4 py-3">
-              <p class="text-[11px] uppercase tracking-[0.16em] text-gray-400">{{ t('personalCenter.tabs.orders') }}</p>
-              <p class="mt-2 text-sm font-semibold text-muted-foreground">
-                {{ userProfileStore.loadingOrders ? '-' : userProfileStore.ordersTotal }}
-              </p>
-            </div>
-            <div class="rounded-2xl border bg-secondary px-4 py-3">
-              <p class="text-[11px] uppercase tracking-[0.16em] text-gray-400">{{ t('personalCenter.overview.accountLabel') }}</p>
-              <Badge class="mt-2" :variant="emailVerifiedVariant" size="sm">
-                {{ emailVerifiedLabel }}
-              </Badge>
-            </div>
+          <div class="relative flex flex-wrap items-center gap-2">
+            <Badge :variant="emailVerifiedVariant" size="sm">{{ emailVerifiedLabel }}</Badge>
+            <span
+              v-if="userProfileStore.currentLevel"
+              class="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
+            >
+              <img v-if="isImagePath(userProfileStore.currentLevel?.icon)" :src="getImageUrl(userProfileStore.currentLevel!.icon)" class="h-3.5 w-3.5 object-contain" alt="" />
+              <span v-else-if="userProfileStore.currentLevel?.icon">{{ userProfileStore.currentLevel.icon }}</span>
+              <Crown v-else class="h-3.5 w-3.5" />
+              {{ levelName(userProfileStore.currentLevel) }}
+            </span>
           </div>
         </div>
       </header>
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <aside class="lg:col-span-3">
-          <div class="rounded-2xl border bg-card p-4 shadow-sm backdrop-blur-sm lg:sticky lg:top-24">
-            <div class="hidden flex-col gap-2 lg:flex">
+          <div class="rounded-2xl border bg-card p-4 shadow-sm lg:sticky lg:top-24">
+            <div class="hidden flex-col gap-0.5 lg:flex">
               <button
                 v-for="item in sectionItems"
                 :key="item.key"
                 type="button"
                 @click="switchSection(item.key)"
-                class="group w-full rounded-xl border px-4 py-3 text-left text-sm font-medium transition-all"
+                class="group relative flex w-full items-center gap-2.5 rounded-lg py-2.5 pl-4 pr-3 text-left text-sm font-semibold transition-colors"
                 :class="currentSection === item.key
-                  ? 'border-primary/40 bg-primary/10 text-foreground'
-                  : 'bg-secondary text-muted-foreground hover:text-primary hover:border-primary/45'"
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:bg-accent hover:text-foreground'"
               >
-                <span class="flex items-center justify-between gap-3">
-                  <span class="flex items-center gap-2">
-                    <component :is="item.icon" class="h-4 w-4" />
-                    <span>{{ t(item.label) }}</span>
-                  </span>
-                  <span
-                    class="h-1.5 w-1.5 rounded-full transition-colors"
-                    :class="currentSection === item.key ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600 group-hover:bg-gray-400 dark:group-hover:bg-gray-500'"
-                  ></span>
-                </span>
+                <span
+                  class="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full transition-all"
+                  :class="currentSection === item.key ? 'bg-primary' : 'bg-transparent'"
+                ></span>
+                <component :is="item.icon" class="h-4 w-4 shrink-0" />
+                <span class="truncate">{{ t(item.label) }}</span>
               </button>
             </div>
 
             <div class="lg:hidden">
-              <div class="flex gap-2 overflow-x-auto pb-1">
+              <div class="flex gap-1.5 overflow-x-auto pb-1">
                 <button
                   v-for="item in sectionItems"
                   :key="item.key"
                   type="button"
                   @click="switchSection(item.key)"
-                  class="shrink-0 rounded-lg border px-4 py-2 text-xs font-semibold transition-colors"
+                  class="shrink-0 rounded-lg px-3.5 py-2 text-xs font-semibold transition-colors"
                   :class="currentSection === item.key
-                    ? 'border-primary/40 bg-primary/10 text-foreground'
-                    : 'bg-secondary text-muted-foreground hover:text-primary hover:border-primary/45'"
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground'"
                 >
                   <span class="flex items-center gap-1.5">
                     <component :is="item.icon" class="h-3.5 w-3.5" />
@@ -95,28 +86,38 @@
           </Alert>
 
           <template v-if="currentSection === 'overview'">
-            <!-- User info card -->
-            <div class="rounded-2xl border bg-card p-6 shadow-sm">
-              <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div class="flex items-center gap-4">
-                  <div class="flex h-14 w-14 items-center justify-center rounded-2xl border-primary/40 bg-primary/10 text-lg font-black text-primary">
-                    {{ displayInitial }}
-                  </div>
-                  <div>
-                    <p class="text-xs uppercase tracking-[0.18em] text-gray-500">{{ t('personalCenter.overview.accountLabel') }}</p>
-                    <h2 class="mt-1 text-xl font-black text-foreground">{{ userProfileStore.displayName }}</h2>
-                    <p class="mt-1 text-sm text-muted-foreground">{{ userProfileStore.profile?.email || '-' }}</p>
-                  </div>
-                </div>
-                <div class="flex flex-wrap items-center gap-2">
-                  <Button as-child variant="secondary" size="sm">
-                    <router-link to="/reseller">{{ t('resellerConsole.title') }}</router-link>
-                  </Button>
-                  <Badge :variant="emailVerifiedVariant" size="sm">
-                    {{ emailVerifiedLabel }}
-                  </Badge>
-                </div>
-              </div>
+            <!-- 数据一览 -->
+            <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              <StatCard
+                :label="t('personalCenter.tabs.orders')"
+                :value="userProfileStore.loadingOrders ? '—' : userProfileStore.ordersTotal"
+                :icon="ShoppingBag"
+                tone="info"
+                mono
+              />
+              <StatCard :label="t('personalCenter.memberLevel.currentLevel')" :icon="Crown" tone="accent">
+                <template #value>
+                  <span class="flex items-center gap-1.5">
+                    <img v-if="isImagePath(userProfileStore.currentLevel?.icon)" :src="getImageUrl(userProfileStore.currentLevel!.icon)" class="h-5 w-5 shrink-0 object-contain" alt="" />
+                    <span class="truncate">{{ levelName(userProfileStore.currentLevel) }}</span>
+                  </span>
+                </template>
+              </StatCard>
+              <StatCard
+                :label="t('personalCenter.memberLevel.discountRate')"
+                :value="discountText"
+                :icon="Percent"
+                tone="warning"
+              />
+              <StatCard
+                :label="t('personalCenter.overview.accountLabel')"
+                :icon="ShieldCheck"
+                :tone="emailVerifiedVariant === 'success' ? 'success' : 'warning'"
+              >
+                <template #value>
+                  <Badge :variant="emailVerifiedVariant" size="sm">{{ emailVerifiedLabel }}</Badge>
+                </template>
+              </StatCard>
             </div>
 
             <!-- Member level card -->
@@ -152,7 +153,7 @@
               </div>
 
               <!-- Next level upgrade progress -->
-              <div v-if="userProfileStore.nextLevel" class="mt-5 rounded-xl bg-secondary p-4">
+              <div v-if="userProfileStore.nextLevel" class="mt-5 rounded-xl border border-primary/15 bg-primary/5 p-4">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <!-- Next level info -->
                   <div class="flex items-center gap-3">
@@ -226,7 +227,7 @@
                 ></div>
               </div>
 
-              <div v-else-if="userProfileStore.recentOrders.length === 0" class="rounded-xl border border-dashed bg-secondary px-4 py-5 text-sm text-muted-foreground">
+              <div v-else-if="userProfileStore.recentOrders.length === 0" class="rounded-xl border border-dashed px-4 py-5 text-sm text-muted-foreground">
                 {{ t('personalCenter.overview.emptyOrders') }}
               </div>
 
@@ -234,7 +235,7 @@
                 <div
                   v-for="order in userProfileStore.recentOrders"
                   :key="order.order_no"
-                  class="rounded-xl border bg-secondary px-4 py-3 transition-all transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
+                  class="rounded-xl border bg-card px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
                 >
                   <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -248,7 +249,7 @@
                       <Badge :variant="statusVariant(order.status)" size="sm">
                         {{ statusLabel(order.status) }}
                       </Badge>
-                      <Button as-child variant="secondary" size="sm">
+                      <Button as-child variant="outline" size="sm">
                         <router-link :to="`/orders/${order.order_no}`">{{ t('orders.viewDetails') }}</router-link>
                       </Button>
                       <Button v-if="order.status === 'pending_payment'" as-child size="sm">
@@ -286,8 +287,9 @@
 import { computed, onMounted, ref, type Component } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { Banknote, Home, ShoppingBag, Wallet, Gift, ShieldCheck, UserCircle, Megaphone, Key } from 'lucide-vue-next'
+import { Banknote, Home, ShoppingBag, Wallet, Gift, ShieldCheck, UserCircle, Megaphone, Key, Crown, Percent } from 'lucide-vue-next'
 import { getImageUrl } from '../utils/image'
+import StatCard from '../components/shared/StatCard.vue'
 import { orderStatusLabel, orderStatusVariant } from '../utils/status'
 import { pageAlertVariant, pageAlertToneClass, type PageAlert } from '../utils/alerts'
 import { useUserProfileStore } from '../stores/userProfile'
@@ -375,6 +377,14 @@ const emailVerifiedLabel = computed(() => {
 
 const emailVerifiedVariant = computed<'success' | 'warning'>(() => {
   return userProfileStore.profile?.email_verified_at ? 'success' : 'warning'
+})
+
+const discountText = computed(() => {
+  const lvl = userProfileStore.currentLevel
+  if (lvl && lvl.discount_rate < 100) {
+    return t('personalCenter.memberLevel.discountOff', { n: lvl.discount_rate / 10 })
+  }
+  return t('personalCenter.memberLevel.noDiscount')
 })
 
 const isImagePath = (icon: string | undefined | null) => icon?.startsWith('/uploads/') || icon?.startsWith('http')

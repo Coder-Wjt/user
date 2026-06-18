@@ -1,19 +1,13 @@
 <template>
   <div class="space-y-6 api-panel-enter">
-    <div class="rounded-2xl border bg-card p-7 shadow-sm overflow-hidden">
-      <div class="relative">
-        <div class="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-violet-400/10 blur-2xl"></div>
-        <div class="pointer-events-none absolute -bottom-16 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-sky-400/10 blur-2xl"></div>
-        <div class="relative">
-          <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 class="text-xl font-bold text-foreground">{{ t('personalCenter.apiPanel.title') }}</h2>
-              <p class="mt-1 text-sm text-muted-foreground">{{ t('personalCenter.apiPanel.subtitle') }}</p>
-            </div>
-            <Badge variant="accent" size="sm">
-              {{ t('personalCenter.tabs.api') }}
-            </Badge>
-          </div>
+    <div class="rounded-2xl border bg-card p-7 shadow-sm">
+      <div>
+        <div>
+          <PanelHeading :title="t('personalCenter.apiPanel.title')" :description="t('personalCenter.apiPanel.subtitle')" :icon="Key">
+            <template #actions>
+              <Badge variant="accent" size="sm">{{ t('personalCenter.tabs.api') }}</Badge>
+            </template>
+          </PanelHeading>
 
           <Alert v-if="panelAlert" class="mb-5" :variant="pageAlertVariant(panelAlert.level)" :class="pageAlertToneClass(panelAlert.level)">
             <AlertDescription>{{ panelAlert.message }}</AlertDescription>
@@ -25,7 +19,7 @@
           </div>
 
           <!-- No credential / null -->
-          <div v-else-if="!credential" class="rounded-xl border border-dashed bg-secondary p-5">
+          <div v-else-if="!credential" class="rounded-xl border border-dashed p-5">
             <p class="text-sm text-muted-foreground">
               {{ t('personalCenter.apiPanel.noCredential') }}
             </p>
@@ -35,7 +29,7 @@
           </div>
 
           <!-- Pending review -->
-          <div v-else-if="credential.status === 'pending_review'" class="rounded-xl border border-dashed bg-secondary p-5">
+          <div v-else-if="credential.status === 'pending_review'" class="rounded-xl border border-dashed p-5">
             <div class="flex items-start gap-3">
               <div class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400">
                 <AlertTriangle class="h-4 w-4" />
@@ -48,7 +42,7 @@
           </div>
 
           <!-- Rejected -->
-          <div v-else-if="credential.status === 'rejected'" class="rounded-xl border border-dashed bg-secondary p-5">
+          <div v-else-if="credential.status === 'rejected'" class="rounded-xl border border-dashed p-5">
             <div class="flex items-start gap-3">
               <div class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-500/20 text-red-600 dark:text-red-400">
                 <XCircle class="h-4 w-4" />
@@ -95,26 +89,26 @@
               </div>
 
               <!-- API Key -->
-              <div class="rounded-xl border bg-secondary p-4">
+              <div class="rounded-xl border p-4">
                 <div class="text-xs text-muted-foreground">API Key</div>
                 <div class="mt-2 flex flex-wrap items-center gap-2">
                   <span class="rounded-lg border border-border bg-muted/30 px-2 py-1 font-mono text-sm text-foreground break-all">
                     {{ credential.api_key || '-' }}
                   </span>
-                  <Button type="button" variant="secondary" size="sm" @click="copyToClipboard(credential.api_key || '')">
+                  <Button type="button" variant="outline" size="sm" @click="copyToClipboard(credential.api_key || '')">
                     {{ t('personalCenter.apiPanel.copy') }}
                   </Button>
                 </div>
               </div>
 
               <!-- API Secret -->
-              <div class="rounded-xl border bg-secondary p-4">
+              <div class="rounded-xl border p-4">
                 <div class="text-xs text-muted-foreground">API Secret</div>
                 <div class="mt-2 flex flex-wrap items-center gap-2">
                   <span class="rounded-lg border border-border bg-muted/30 px-2 py-1 font-mono text-sm text-foreground">
                     {{ maskedSecret }}
                   </span>
-                  <Button type="button" variant="secondary" size="sm" :disabled="submitting" @click="handleRegenerate">
+                  <Button type="button" variant="outline" size="sm" :disabled="submitting" @click="handleRegenerate">
                     {{ t('personalCenter.apiPanel.regenerate') }}
                   </Button>
                 </div>
@@ -154,7 +148,7 @@
               </div>
 
               <!-- Enable / Disable toggle -->
-              <div class="rounded-xl border bg-secondary p-4">
+              <div class="rounded-xl border p-4">
                 <div class="flex items-center justify-between">
                   <div>
                     <div class="text-sm font-medium text-foreground">{{ t('personalCenter.apiPanel.statusLabel') }}</div>
@@ -166,7 +160,7 @@
                     type="button"
                     :disabled="submitting"
                     class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
-                    :class="credential.is_active ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'"
+                    :class="credential.is_active ? 'bg-emerald-500' : 'bg-muted-foreground/30'"
                     role="switch"
                     :aria-checked="credential.is_active"
                     @click="handleToggleStatus"
@@ -195,7 +189,7 @@
                     {{ t('personalCenter.apiPanel.regenerateDesc') }}
                   </p>
                   <div class="mt-5 flex justify-end gap-3">
-                    <Button type="button" variant="secondary" class="font-semibold" @click="showConfirm = false">
+                    <Button type="button" variant="outline" class="font-semibold" @click="showConfirm = false">
                       {{ t('personalCenter.apiPanel.cancel') }}
                     </Button>
                     <Button type="button" variant="destructive" :disabled="submitting" class="font-bold" @click="confirmRegenerate">
@@ -217,7 +211,8 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { apiCredentialAPI } from '../../api'
 import { pageAlertVariant, pageAlertToneClass, type PageAlert } from '../../utils/alerts'
-import { AlertTriangle, XCircle, Info, Check } from 'lucide-vue-next'
+import { AlertTriangle, XCircle, Info, Check, Key } from 'lucide-vue-next'
+import PanelHeading from '../../components/shared/PanelHeading.vue'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'

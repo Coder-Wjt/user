@@ -164,21 +164,21 @@ onBeforeUnmount(() => {
             <!-- Footer -->
             <div class="flex flex-col gap-3 border-t px-6 pb-5 pt-4 sm:flex-row sm:items-center sm:justify-between">
               <div class="flex items-center justify-center gap-2 text-xs sm:justify-start">
-                <button
-                  type="button"
-                  class="rounded-md px-1 py-0.5 text-muted-foreground transition-colors hover:text-foreground"
+                <Button
+                  variant="link"
+                  class="h-auto p-0 text-xs font-normal text-muted-foreground hover:text-foreground"
                   @click="handleDismissToday"
                 >
                   {{ t('announcement.dismissToday') }}
-                </button>
+                </Button>
                 <span class="select-none opacity-30 text-muted-foreground">·</span>
-                <button
-                  type="button"
-                  class="rounded-md px-1 py-0.5 text-muted-foreground transition-colors hover:text-foreground"
+                <Button
+                  variant="link"
+                  class="h-auto p-0 text-xs font-normal text-muted-foreground hover:text-foreground"
                   @click="handleDismissForever"
                 >
                   {{ t('announcement.dismissForever') }}
-                </button>
+                </Button>
               </div>
               <Button class="w-full rounded-xl sm:w-auto" @click="handleClose">
                 {{ t('announcement.close') }}
