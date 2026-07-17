@@ -57,6 +57,8 @@
       </section>
 
       <!-- Main: Left Categories + Right Product List -->
+      <PurchaseGuide />
+
       <section class="relative z-10 pb-6" :class="showHeroSection ? 'pt-6' : 'pt-24'">
         <div class="container mx-auto px-4">
           <div class="flex flex-col lg:flex-row gap-6">
@@ -260,6 +262,8 @@
       </div>
     </section>
 
+    <PurchaseGuide />
+
     <section id="featured" class="relative z-10 pb-14" :class="showHeroSection ? 'pt-14' : 'pt-32 md:pt-36'">
       <div class="container mx-auto px-4">
         <div class="mb-8 flex items-end justify-between gap-4">
@@ -365,6 +369,7 @@ import ProductListItem from '../components/ProductListItem.vue'
 import ProductQuickBuy from '../components/ProductQuickBuy.vue'
 import CategorySidebar from '../components/CategorySidebar.vue'
 import PaginationNav from '../components/PaginationNav.vue'
+import PurchaseGuide from '../components/PurchaseGuide.vue'
 import EmptyState from '../components/EmptyState.vue'
 import AnnouncementModal from '../components/AnnouncementModal.vue'
 import { useAnnouncement, type HomeAnnouncement } from '../composables/useAnnouncement'
